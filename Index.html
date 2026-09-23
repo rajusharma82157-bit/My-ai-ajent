@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My AI Agent</title>
+<style>
+body{font-family:Arial;margin:0;background:#111;color:white}
+.box{max-width:600px;margin:auto;padding:20px}
+h1{text-align:center}
+#chat{height:55vh;overflow:auto;background:#222;padding:15px;border-radius:15px}
+.msg{padding:10px;margin:8px 0;border-radius:10px}
+.me{background:#075e54;text-align:right}
+.ai{background:#333}
+input{width:65%;padding:14px;border:0;border-radius:10px;margin-top:12px}
+button{padding:13px;margin:4px;border:0;border-radius:10px}
+</style>
+</head>
+
+<body>
+<div class="box">
+<h1>🤖 My AI Agent</h1>
+
+<div id="chat">
+<div class="msg ai">Hello! Main tumhara AI Agent hoon. 😊</div>
+</div>
+
+<input id="text" placeholder="Mujhse kuch pucho...">
+<button onclick="send()">Send</button>
+<button onclick="listen()">🎙️</button>
+
+</div>
+
+<script>
+const chat=document.getElementById("chat");
+const text=document.getElementById("text");
+
+function add(message,type){
+ let d=document.createElement("div");
+ d.className="msg "+type;
+ d.textContent=message;
+ chat.appendChild(d);
+ chat.scrollTop=chat.scrollHeight;
+}
+
+function speak(message){
+ if("speechSynthesis" in window)
+   speechSynthesis.speak(new SpeechSynthesisUtterance(message));
+}
+
+function answer(q){
+ q=q.toLowerCase();
+
+ if(q.includes("hello")||q.includes("hi"))
+   return "Hello yaar! 😊 Main ready hoon.";
+
+ if(q.includes("time"))
+   return "Phone ka current time check karne ke liye main tumhare device ki time setting use kar sakta hoon.";
+
+ if(q.includes("google")||q.includes("search")){
+   window.open("https://www.google.com/search?q="+encodeURIComponent(q));
+   return "Maine Google search khol diya.";
+ }
+
+ return "Abhi mera basic V1 mode hai. Voice aur commands ka system ready hai. Next version mein real AI intelligence connect karenge. 🤖";
+}
+
+function send(){
+ let q=text.value.trim();
+ if(!q)return;
+
+ add(q,"me");
+ text.value="";
+
+ let a=answer(q);
+ setTimeout(()=>{
+   add(a,"ai");
+   speak(a);
+ },300);
+}
+
+function listen(){
+ const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+
+ if(!SpeechRecognition){
+   add("Is browser mein voice recognition available nahi hai.","ai");
+   return;
+ }
+
+ let r=new SpeechRecognition();
+ r.lang="hi-IN";
+ r.start();
+
+ r.onresult=function(e){
+   text.value=e.results[0][0].transcript;
+   send();
+ };
+}
+
+text.addEventListener("keydown",e=>{
+ if(e.key==="Enter")send();
+});
+</script>
+
+</body>
+</html>
